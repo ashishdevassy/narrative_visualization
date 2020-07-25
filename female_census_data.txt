@@ -1,4 +1,4 @@
-sno_age_bracket,count
+sno,age_bracket,count
 1,15 to 17 years,6363
 2,18 to 24 years,14479
 3,25 to 29 years,11485
