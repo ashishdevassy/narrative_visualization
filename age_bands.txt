@@ -1,4 +1,4 @@
-Sno,Status,counts,Silent Gen,Baby Boomers,Gen X,Millenials,Post Millenials
+Sno,Status,cnt,Silent Gen,Baby Boomers,Gen X,Millenials,Post Millenials
 1,Never Married,85410,875,6435,9764,55656,12771
 2,Married,132856,10473,47934,53643,34665,125
 3,Divorced,25480,2037,11577,8254,3568,44
