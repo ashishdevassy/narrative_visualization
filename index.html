@@ -1,0 +1,258 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+</style>
+
+<body onload='init()'>
+<title> US Marital data analysis </title>
+<h1 style="text-align:center"> U.S. Marital Data Analysis </h1>
+<svg width=1800 height=600>
+</svg>
+
+<script>
+	
+async function init() {
+
+//Data for male 
+const mdata = await d3.csv("https://raw.githubusercontent.com/ashishdevassy/narrative_visualization/master/male_census_data.txt");
+console.log(mdata);
+
+//Data for females
+const fdata = await d3.csv("https://raw.githubusercontent.com/ashishdevassy/narrative_visualization/master/female_census_data.txt");
+console.log(fdata);
+
+//Establishing the color patterns begins 
+male_domain = [0,15000];
+m_crange = ["powderblue","navy"];
+var m_col_range = d3.scaleLinear().domain(male_domain).range(m_crange);
+
+female_domain = [0,20000];
+f_crange = ["lightpink","darkred"];
+var f_col_range = d3.scaleLinear().domain(female_domain).range(f_crange);
+//establishing the color patterns ends 
+
+
+//Establishing th range for the bottom axis  
+axisdomain = ["15-17","18-24","25-29","30-34","35-39","40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80-84","85+"]
+axisrange = [0,800]
+axs = d3.scaleBand().domain(axisdomain).range(axisrange);
+    
+//Establishing scales Begins     
+var margin = 50;
+xdomain = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+xrange = [0,800];
+var x = d3.scaleBand().domain(xdomain).range(xrange);
+
+ydomain = [0,15000];
+yrange = [0,500];
+var ys = d3.scaleLinear().domain(ydomain).range(yrange);
+//Establishing scales Ends 
+
+
+//Scene Selection links  /////
+////////////////////////////////////////////
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10) + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/index.html")
+.append("rect")
+.attr("x", "1500") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.attr("xlink:href", "http://en.wikipedia.org/wiki/"+"google")
+.style('fill',"black");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene2.html")
+.append("rect")
+.attr("x", "1550") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene3.html")
+.append("rect")
+.attr("x", "1600") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("text")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.attr("x", "1420") 
+.attr("y", 	"18")
+.attr("font-family", "sans-serif" )
+.attr("font-size","11px")
+.text(" Scene selection ") ;
+
+//Scene Selection links  /////
+/////////////////////////////////////////////
+
+
+//Male charting begins ///////////////////////////////////////////////////
+//Defining the canvas for the Male chart 
+var canvas = d3.select("svg").append("g")
+.attr("transform", "translate(" + margin + "," + margin + ")");
+
+//Adding the bars with mouse over and mouse out events 
+canvas.selectAll("rect")
+.data(mdata)
+.enter()
+.append("rect")
+.attr("x",function(d,i) {return x(i);}) 
+.attr("y", 	function(d) {return 500 - ys(d.count);})
+.attr("width",x.bandwidth())
+.attr("height",function(d) { return ys(d.count);	})
+.style('fill',function(d) {return m_col_range(d.count);})
+.on('mouseover', function(d, i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(100)
+        .attr("y", 	function(d) {return 500 - ys(d.count) - 50;})
+        .attr('width' , 200)
+        .attr("height",function(d) { return ys(d.count) + 50 ; 	})
+        .style('fill',"lightgray");
+        })       
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(100)
+        .attr("y", 	function(d) {return 500 - ys(d.count);})
+        .attr("height",function(d) { return ys(d.count);	})
+        .attr("width",x.bandwidth())
+        .style('fill',function(d) {return m_col_range(d.count);})
+    });
+
+//Adding the axis 
+d3.select("svg").append("g")
+.attr("transform", "translate(" + margin + "," + (margin+500) + ")")
+.style("font-size","15px")
+.call(d3.axisBottom(axs));
+
+
+//Adding the Counts to the Bars 
+canvas.selectAll("text")
+.data(mdata).enter()
+.append("text")
+.attr("x",function(d,i) {return x(i);}) 
+.attr("y", 	function(d) {return (500 - ys(d.count)/2) ;})
+//.attr("font-family", "sans-serif" )
+.attr("font-size","19px")
+.style('fill',function(d) {return m_col_range(d.count);})
+.text(function(d) {return (d.count);});
+
+d3.select("svg").append("g")
+.append("text")
+.attr("x",350) 
+.attr("y", 100)
+//.attr("font-family", "sans-serif" )
+.attr("font-size","70px")
+.style('fill',"gray")
+.text("U.S. male.");
+
+
+
+//Male charting Ends ///////////////////////////////////////////////////
+
+//Female charting begins ///////////////////////////////////////////////////
+var canvas2 = d3.select("svg").append("g")
+.attr("transform", "translate(900," + margin + ")")
+
+canvas2.selectAll("rect")
+.data(fdata)
+.enter()
+.append("rect")
+.attr("x",function(d,i) {return x(i);}) 
+.attr("y", 	function(d) {return 500 - ys(d.count);})
+.attr("width",x.bandwidth())
+.attr("height",function(d) { return ys(d.count);	})
+.style('fill',function(d) {return f_col_range(d.count);})
+.on('mouseover', function(d, i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(100)
+        .attr("y", 	function(d) {return 500 - ys(d.count) - 50;})
+        .attr('width' , 200)
+        .attr("height",function(d) { return ys(d.count) + 50 ; 	})
+        .style('fill',"lightgray");
+        })    
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(100)
+        .attr("y", 	function(d) {return 500 - ys(d.count);})
+        .attr("height",function(d) { return ys(d.count);	})
+        .attr("width",x.bandwidth())
+        .style('fill',function(d) {return f_col_range(d.count);})
+    });
+
+d3.select("svg").append("g")
+.attr("transform", "translate(" + 900 + "," + (margin+500) + ")")
+.style("font-size","15px")
+.call(d3.axisBottom(axs));
+
+//Adding the Counts to the Bars 
+canvas2.selectAll("text")
+.data(fdata).enter()
+.append("text")
+.attr("x",function(d,i) {return x(i);}) 
+.attr("y", 	function(d) {return (500 - ys(d.count)/2) ;})
+//.attr("font-family", "sans-serif" )
+.attr("font-size","19px")
+.style('fill',function(d) {return f_col_range(d.count);})
+.text(function(d) {return (d.count);});
+
+d3.select("svg").append("g")
+.attr("transform", "translate(900," + margin + ")")
+.append("text")
+.attr("x",200) 
+.attr("y", 50)
+//.attr("font-family", "sans-serif" )
+.attr("font-size","70px")
+.style('fill',"gray")
+.text("U.S. female.");
+
+//Female charting begins ///////////////////////////////////////////////////
+}
+</script>
+
+
+<h1>Introduction </h1>
+
+<p> Welcome to the Narrative Visualzation Project for CS498. As part of this project I have built visualizations for US Marital Data. 
+The primary source of the data is the United States Census done in 2019. The data is freely available at the United States Census website. 
+The data is primarily is the form of Spreadsheets, which can be downloaded and used for analytical or other purposes. 
+ </p>
+ <p>
+The entire Narrative is built of three scenes. With each scene providing some level of drilldown capabililities, with tool tips and annotations providing further details. 
+You can click on top right scene selection to navigate across scenes. 
+</p>
+<h2> Scene 1 </h2>
+<p>
+The first scene intends to show the overall age distribution of US Males and Females. As expected the higher counts lean towards 18 - 40. 
+The Age trend is similar for both men and women across the age groups. As you slide over the graph it reveals the actual population counts ( in thousands) for the selection.
+An interesting fact - A dip in population for the Age Band 40-44 can be found in both male and female population. 
+Possible hypothesis for the dip in population of 40-44 can be the landmark judgement of <a href="https://en.wikipedia.org/wiki/Roe_v._Wade">Roe V. Wade</a>
+</p>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+</style>
+
+<body onload='init()'>
+ <title> US Marital data analysis </title>
+ <h1 style="text-align:center"> U.S. Marital Data Analysis </h1>
+
+
+<svg width=1800 height=700>
+</svg>
+
+<script>
+	
+async function init() {
+
+//Data for marital status  
+const marital_data = await d3.csv("https://raw.githubusercontent.com/ashishdevassy/narrative_visualization/master/combined_marital_data.txt");
+console.log(marital_data);
+
+////////////////////////////////////////////////////////////
+//Defining the tooltip 
+var tooltip_ln1 = d3.select("body")
+	.append("div")
+	.style("position", "absolute")
+	.style("width","190px")
+	.style("overflow","auto")
+	.style("z-index", "100")
+	.style("visibility", "hidden")
+	.style("font-weight","bold")
+	.style("color", "Black")
+	.style("background","lightgray")
+	.text("tooltip")
+;
+////////////////////////////////////////////////////////////
+	
+
+////////////////////////////////////////////////////////////
+//Establishing Ranges and Scales 
+
+//Establishing the color patterns begins 
+color_domain = [0,26000];
+crange = ["gray","Orchid"];
+var col_range = d3.scaleLinear().domain(color_domain).range(crange);
+
+//Establishing radius scales 
+radius_domain = [0,26000];
+r_range = [5,70];
+var rad_range = d3.scaleLinear().domain(radius_domain).range(r_range);
+
+
+
+//Establishing th range for the bottom axis  
+axisdomain = ["15-17","18-24","25-29","30-34","35-39","40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80-84","85+"]
+axisrange = [0,1200]
+axs = d3.scaleBand().domain(axisdomain).range(axisrange);
+
+//Establishing range for Y axis on the left 
+L_axisdomain = ["Never Married","Married","Seperated","Divorced","Widowed"]
+L_axisrange = [650,0]
+L_axs = d3.scaleBand().domain(L_axisdomain).range(L_axisrange);
+
+
+    
+//Establishing scales Begins     
+var margin = 100;
+xdomain = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14];
+xrange = [0,1200];
+var x = d3.scaleBand().domain(xdomain).range(xrange);
+
+ydomain = [0,4];
+yrange = [50,500];
+var ys = d3.scaleLinear().domain(ydomain).range(yrange);
+//Establishing scales Ends 
+////////////////////////////////////////////////////////////
+
+
+
+////////////////////////////////////////////////////////////
+//Defining canvas Begins 
+var canvas = d3.select("svg").append("g")
+.attr("transform", "translate(" + margin + "," + margin + ")");
+
+////////////////////////////////////////////////////////////
+//Scene Selection links and texts /////
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10) + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/index.html")
+.append("rect")
+.attr("x", "1500") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.attr("xlink:href", "http://en.wikipedia.org/wiki/"+"google")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene2.html")
+.append("rect")
+.attr("x", "1550") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene3.html")
+.append("rect")
+.attr("x", "1600") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"black");
+
+d3.select("svg")
+.append("text")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.attr("x", "1420") 
+.attr("y", 	"18")
+.attr("font-family", "sans-serif" )
+.attr("font-size","11px")
+.text(" Scene selection ") ;
+//Scene Selection links and texts  /////
+////////////////////////////////////////////////////////////
+
+
+// Designing circles begins ///////////
+canvas
+.append("g")
+.attr("transform", "translate(" + 75 + "," + 0 + ")")
+.selectAll("circle")
+.data(marital_data).enter()
+.append("circle")
+.attr("cx",function(d,i) {return x(i);})
+.attr("cy",function() {	return 530 - ys(0);})
+.attr("r",function(d) {	return rad_range(d.NeverMarried);})
+.style('fill',function(d){return col_range(d.NeverMarried);})
+.on('mouseover', function(d,i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", 	function(d) {	return rad_range(d.NeverMarried) + 50;})
+        .style("opacity", 1.0)
+        .style('fill',"YellowGreen");
+      return tooltip_ln1.style("visibility", "visible");
+        })
+.on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    .text( "For the age band of "+d.AgeBand+ ": Never Married-" + d.NeverMarried 
+	          +" ,Married-"+d.Married
+	          +" ,Separated-"+d.Seperated
+	          +" ,Divorced-"+d.Divorced
+	          +" & Widowed-"+d.Widowed
+	     )}
+	)          
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+     d3.select(this)
+        .transition()
+        .duration(2000)
+        .attr("r", 	function(d) {	return rad_range(d.NeverMarried) ;})
+        .style('fill',function(d){return col_range(d.NeverMarried);})
+     return tooltip_ln1.style("visibility", "hidden");
+    });
+
+
+canvas
+.append("g")
+.attr("transform", "translate(" + 75 + "," + 0 + ")")
+.selectAll("circle")
+.data(marital_data).enter()
+.append("circle")
+.attr("cx",function(d,i) {return x(i);})
+.attr("cy",function() {	return 520 - ys(1);})
+.attr("r",function(d) {	return rad_range(d.Married);})
+.style('fill',function(d){return col_range(d.Married);})
+.on('mouseover', function(d,i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", 	function(d) {	return rad_range(d.Married) + 50;})
+        .style("opacity", 1.0)
+        .style('fill',"YellowGreen");
+      return tooltip_ln1.style("visibility", "visible");
+        })
+.on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    .text( "For the age band of "+d.AgeBand+ ": Never Married-" + d.NeverMarried 
+	          +" ,Married-"+d.Married
+	          +" ,Separated-"+d.Seperated
+	          +" ,Divorced-"+d.Divorced
+	          +" & Widowed-"+d.Widowed
+	     )}
+	)         
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+     d3.select(this)
+        .transition()
+        .duration(2000)
+        .attr("r", 	function(d) {	return rad_range(d.Married) ;})
+        .style('fill',function(d){return col_range(d.Married);})
+     return tooltip_ln1.style("visibility", "hidden");
+    });
+
+
+canvas
+.append("g")
+.attr("transform", "translate(" + 75 + "," + 0 + ")")
+.selectAll("circle")
+.data(marital_data).enter()
+.append("circle")
+.attr("cx",function(d,i) {return x(i);})
+.attr("cy",function() {	return 500 - ys(2);})
+.attr("r",function(d) {	return rad_range(d.Seperated);})
+.style('fill',function(d){return col_range(d.Seperated);})
+.on('mouseover', function(d,i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", 	function(d) {	return rad_range(d.Seperated) + 50;})
+        .style("opacity", 1.0)
+        .style('fill',"YellowGreen");
+      return tooltip_ln1.style("visibility", "visible");
+        })
+.on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    .text( "For the age band of "+d.AgeBand+ ": Never Married-" + d.NeverMarried 
+	          +" ,Married-"+d.Married
+	          +" ,Separated-"+d.Seperated
+	          +" ,Divorced-"+d.Divorced
+	          +" & Widowed-"+d.Widowed
+	     )}
+	)         
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+     d3.select(this)
+        .transition()
+        .duration(2000)
+        .attr("r", 	function(d) {	return rad_range(d.Seperated) ;})
+        .style('fill',function(d){return col_range(d.Seperated);})
+     return tooltip_ln1.style("visibility", "hidden");
+    });
+
+canvas
+.append("g")
+.attr("transform", "translate(" + 75 + "," + 0 + ")")
+.selectAll("circle")
+.data(marital_data).enter()
+.append("circle")
+.attr("cx",function(d,i) {return x(i);})
+.attr("cy",function() {	return 480 - ys(3);})
+.attr("r",function(d) {	return rad_range(d.Divorced);})
+.style('fill',function(d){return col_range(d.Divorced);})
+.on('mouseover', function(d,i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", 	function(d) {	return rad_range(d.Divorced) + 50;})
+        .style("opacity", 1.0)
+        .style('fill',"YellowGreen");
+      return tooltip_ln1.style("visibility", "visible");
+        })
+.on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    .text( "For the age band of "+d.AgeBand+ ": Never Married-" + d.NeverMarried 
+	          +" ,Married-"+d.Married
+	          +" ,Separated-"+d.Seperated
+	          +" ,Divorced-"+d.Divorced
+	          +" & Widowed-"+d.Widowed
+	     )}
+	)         
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+     d3.select(this)
+        .transition()
+        .duration(2000)
+        .attr("r", 	function(d) {	return rad_range(d.Divorced) ;})
+        .style('fill',function(d){return col_range(d.Divorced);})
+     return tooltip_ln1.style("visibility", "hidden");
+    });
+
+canvas
+.append("g")
+.attr("transform", "translate(" + 75 + "," + 0 + ")")
+.selectAll("circle")
+.data(marital_data).enter()
+.append("circle")
+.attr("cx",function(d,i) {return x(i);})
+.attr("cy",function() {	return 465 - ys(4);})
+.attr("r",function(d) {	return rad_range(d.Widowed);})
+.style('fill',function(d){return col_range(d.Widowed);})
+.on('mouseover', function(d,i) {
+      console.log("mouseover on", this);
+      // make the mouseover'd element
+      d3.select(this)
+        .transition()
+        .duration(1000)
+        .attr("r", 	function(d) {	return rad_range(d.Widowed) + 50;})
+        .style("opacity", 1.0)
+        .style('fill',"YellowGreen");
+      return tooltip_ln1.style("visibility", "visible");
+        })
+.on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    .text( "For the age band of "+d.AgeBand+ ": Never Married-" + d.NeverMarried 
+	          +" ,Married-"+d.Married
+	          +" ,Separated-"+d.Seperated
+	          +" ,Divorced-"+d.Divorced
+	          +" & Widowed-"+d.Widowed
+	     )}
+	)         
+.on('mouseout', function(d, i) {
+      console.log("mouseout", this);
+      // return the mouseover'd element
+     d3.select(this)
+        .transition()
+        .duration(2000)
+        .attr("r", 	function(d) {	return rad_range(d.Widowed) ;})
+        .style('fill',function(d){return col_range(d.Widowed);})
+     return tooltip_ln1.style("visibility", "hidden");
+    });
+
+// Designing circles Ends    ///////////
+
+//Adding the bottom axis //////////////
+d3.select("svg").append("g")
+.attr("transform", "translate(" + (margin+40) + "," + 650 + ")")
+.style("font-size","20px")
+.call(d3.axisBottom(axs));
+
+//Adding the Left  axis //////////////
+d3.select("svg").append("g")
+.attr("transform", "translate(" + (margin + 40) + "," + 0 + ")")
+.style("font-size","20px")
+.call(d3.axisLeft(L_axs));
+
+/////////////////////
+
+function wrap(text, width) {
+    text.each(function () {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            x = text.attr("x"),
+            y = text.attr("y"),
+            dy = 0, //parseFloat(text.attr("dy")),
+            tspan = text.text(null)
+                        .append("tspan")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .text(word);
+            }
+        }
+    });
+}
+
+
+
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 1340 + "," + 150 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	//.style("overflow","auto")
+  .style("font-size","20px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+  .text("This is a more detailed exploration of the data and represents the total population of 263 million (approx). The size of the circle is a representation of the population for that selection. And the Visual representation shows you which category the major population sections fall into. Hovering over the circles provide further details of the selection and the numbers are represented in 1000s. You can use the -Scene Selection- at the top-right corner to move through scenes.As we can see the major section of the population towards the earlier years is primarily -Never Married-. As years go by we see trend shifting into the -Married- and other sections. The switch happens in the 30's when the number of -Never Marrried - population is now less that the number of -Married-. Furthermore we see that divorce up trends somewhere around late 30s to early 40s and maintains the similar rate till late 60s. And as expected the number of widowed population uptrends from late 60s to all the way through.") 
+  .call(wrap, 400);
+
+
+}
+</script>
+
+<h2> Scene 3 </h2>
+
+
+</body>
+</html>

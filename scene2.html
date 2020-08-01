@@ -1,0 +1,569 @@
+<html>
+<script src='https://d3js.org/d3.v5.min.js'></script>
+<style>
+    </style>
+
+<body>
+<title> US Marital data analysis </title>
+<h1 style="text-align:center"> U.S. Marital Data Analysis </h1>
+<svg width=1800 height=600>
+</svg>
+
+<script>
+	
+
+var margin = 100;
+
+////////////////////////////////////////////////////////////
+//Defining the tooltip 
+var tooltip_ln1 = d3.select("body")
+	.append("div")
+	.style("position", "absolute")
+	.style("width","190px")
+	.style("overflow","auto")
+	.style("z-index", "100")
+	.style("visibility", "hidden")
+	.style("font-weight","bold")
+	.style("color", "Black")
+	//.style("background","lightgray")
+	.text("tooltip")
+;
+
+
+
+//Scene Selection links  /////
+////////////////////////////////////////////
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10) + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/index.html")
+.append("rect")
+.attr("x", "1500") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.attr("xlink:href", "http://en.wikipedia.org/wiki/"+"google")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene2.html")
+.append("rect")
+.attr("x", "1550") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"black");
+
+d3.select("svg")
+.append("g")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.append("a")
+.attr("xlink:href", "https://ashishdevassy.github.io/narrative_visualization/scene3.html")
+.append("rect")
+.attr("x", "1600") 
+.attr("y", 	"0")
+.attr("width","40")
+.attr("height","30")
+.style('fill',"gray");
+
+d3.select("svg")
+.append("text")
+.attr("transform", "translate(" + margin + "," + (margin-10)  + ")")
+.attr("x", "1420") 
+.attr("y", 	"18")
+.attr("font-family", "sans-serif" )
+.attr("font-size","11px")
+.text(" Scene selection ") ;
+
+//Scene Selection links  /////
+/////////////////////////////////////////////
+cnts = [];
+SGen = [];
+BBoomers = [];
+GX = [];
+Mlnl = [];
+PMlnl = [];
+Stts = [];
+var color = ['pink','turquoise','lawngreen','skyblue','lightslategray'];
+var arcOver = d3.arc().innerRadius(0).outerRadius(250);
+var pie = d3.pie();
+var arc = d3.arc().innerRadius(0).outerRadius(200);
+
+
+d3.csv("https://raw.githubusercontent.com/ashishdevassy/narrative_visualization/master/age_bands.txt").then(function(data) {
+  data.forEach(function(d) { d.cnt = +d.cnt;
+                             d.SilentGen = +d.SilentGen;    
+                             d.BabyBoomers = +d.BabyBoomers;    
+                             d.GenX = +d.GenX;
+                             d.Millenials = +d.Millenials;    
+                             d.PostMillenials = +d.PostMillenials; 
+                             //d.Status = +d.Status;
+                             cnts.push(+d.cnt);
+                             Stts.push(d.Status);
+                             SGen.push(+d.SilentGen);
+                             BBoomers.push(+d.BabyBoomers);
+                             GX.push(+d.GenX);
+                             Mlnl.push(+d.Millenials);
+                             PMlnl.push(+d.PostMillenials);
+                             });
+
+  //var testu = data[1].cnt;
+  console.log(data);
+  console.log(cnts);
+  console.log(SGen);
+  console.log(BBoomers);
+  console.log(GX);
+  console.log(Mlnl);  
+  console.log(PMlnl);  
+  
+  /// main pie chart begins ////
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 250 + "," + 300 + ")")
+	.selectAll("path")
+	.data(pie(cnts))
+	.enter()
+	.append("path")
+	.attr("d",arc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", arcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", arc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+
+/////main pie chart complete ///
+
+//define legends begins ////////////
+var color2 = ['coral','turquoise','mediumseagreen','dodgerblue','lightslategray'];
+var status = 
+
+//adding text to define shit  
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 320 + "," + 20 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","200px")
+	.style("overflow","auto")
+  .style("font-size","25px")
+	.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Adult population Breakdown")	
+
+
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 360 + "," + 50 + ")")
+  .selectAll("rect").data(color).enter()
+	.append("rect")
+	.attr("x", "150") 
+  .attr("y", 	function(d,i){return 100 + (i*50);})
+  .attr("width","150")
+  .attr("height","30")
+  .style("fill",function(d){return d;});
+
+console.log(Stts);
+
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 360 + "," + 50 + ")")
+  .selectAll("text").data(Stts).enter()
+  .append("text")
+  .attr("x",150)
+  .attr("y",function(d,i){return 125 + (i*50);})
+  .style("position", "absolute")
+	.style("width","150px")
+	.style("overflow","auto")
+  .style("font-size","20px")
+	.style("color", "gray")
+	.text(function(d){return d;});
+
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 440 + "," + 440 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","20px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("263 million people with age > 15.")	
+
+//define legend Ends ///////////
+
+
+/// Smaller  pie charts begin ////
+var SarcOver = d3.arc().innerRadius(0).outerRadius(100);
+//var pie = d3.pie();
+var Sarc = d3.arc().innerRadius(0).outerRadius(80);
+
+
+//Charting for Silent gen begins 
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 800 + "," + 200 + ")")
+	.selectAll("path")
+	.data(pie(SGen))
+	.enter()
+	.append("path")
+	.attr("d",Sarc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", SarcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", Sarc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+    
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 730 + "," + 290 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","15px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Silent Generation")
+///////chart for Silent gen complete///////
+
+
+
+
+//Charting for B Boomers begins 
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 900 + "," + 450 + ")")
+	.selectAll("path")
+	.data(pie(BBoomers))
+	.enter()
+	.append("path")
+	.attr("d",Sarc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", SarcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", Sarc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+    
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 840 + "," + 545 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","15px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Baby Boomers");
+///////chart for BBoomers complete///////
+
+
+
+//Charting for GX begins 
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 1100 + "," + 200 + ")")
+	.selectAll("path")
+	.data(pie(GX))
+	.enter()
+	.append("path")
+	.attr("d",Sarc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", SarcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", Sarc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+    
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 1050 + "," + 290 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","15px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Gen X");
+///////chart for Gen X complete///////
+
+
+//Charting for Millenials begins 
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 1200 + "," + 450 + ")")
+	.selectAll("path")
+	.data(pie(Mlnl))
+	.enter()
+	.append("path")
+	.attr("d",Sarc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", SarcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", Sarc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+    
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 1150 + "," + 545 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","15px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Millenials");
+///////chart for Millenials complete///////
+
+
+//Charting for Post Millenials begins 
+	 d3.select("svg")
+	.append("g")
+	.attr("transform", "translate(" + 1400 + "," + 200 + ")")
+	.selectAll("path")
+	.data(pie(PMlnl))
+	.enter()
+	.append("path")
+	.attr("d",Sarc)
+	.attr("fill",function(d,i){return color[i];})	
+	.on("mouseenter", function(d) {
+        d3.select(this)
+           .attr("stroke","black")
+           .attr("stroke-width",3)
+           .transition()
+           .duration(1000)
+           .attr("d", SarcOver);   
+     	return tooltip_ln1.style("visibility", "visible")
+     	.text(d.data);
+    })
+  .on('click', function(){
+  	console.log(d.data);
+  	console.log(i);
+  	})
+  .on("mousemove", function(d){
+	return tooltip_ln1
+	    .style("top", (event.pageY-10)+"px")
+	    .style("left",(event.pageX+10)+"px")
+	    })
+	.on("mouseleave", function(d) {
+        d3.select(this).transition()            
+           .attr("d", Sarc)
+           .attr("stroke","none");
+     	return tooltip_ln1.style("visibility", "hidden");
+    });
+    
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 1340 + "," + 290 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	.style("overflow","auto")
+  .style("font-size","15px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("Post Millenials");
+///////chart for Post Millenials complete///////
+/////Smaller population pie chart complete ///
+
+function wrap(text, width) {
+    text.each(function () {
+        var text = d3.select(this),
+            words = text.text().split(/\s+/).reverse(),
+            word,
+            line = [],
+            lineNumber = 0,
+            lineHeight = 1.1, // ems
+            x = text.attr("x"),
+            y = text.attr("y"),
+            dy = 0, //parseFloat(text.attr("dy")),
+            tspan = text.text(null)
+                        .append("tspan")
+                        .attr("x", x)
+                        .attr("y", y)
+                        .attr("dy", dy + "em");
+        while (word = words.pop()) {
+            line.push(word);
+            tspan.text(line.join(" "));
+            if (tspan.node().getComputedTextLength() > width) {
+                line.pop();
+                tspan.text(line.join(" "));
+                line = [word];
+                tspan = text.append("tspan")
+                            .attr("x", x)
+                            .attr("y", y)
+                            .attr("dy", ++lineNumber * lineHeight + dy + "em")
+                            .text(word);
+            }
+        }
+    });
+}
+
+
+
+d3.select("svg")
+	.append("g")
+  .attr("transform", "translate(" + 1340 + "," + 350 + ")")
+  .append("text")
+  .attr("x",20)
+  .attr("y",20)
+  //.attr("text-anchor","middle")
+  .style("position", "absolute")
+	.style("width","100px")
+	//.style("overflow","auto")
+  .style("font-size","25px")
+	//.style("font-weight","bold")
+	.style("color", "gray")
+	//.style("background","lightgray")
+	.text("This scene intends to show the population distribution along different generational groups. As you move over the charts it displays the actual marital distribution for that Age Band. The population representation is in thousands.")
+  .call(wrap, 400);
+});
+
+
+</script>
+
+<h2> Scene 2 </h2>
+<p>
+Welcome to Scene 2, with this scene we begin to focus in to the Marital statuses of Generational groups. 
+</p>
+</body>
+</html>
